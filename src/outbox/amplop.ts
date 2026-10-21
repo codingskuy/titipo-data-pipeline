@@ -11,10 +11,10 @@ export function buatAmplop(jenis: JenisEvent, payload: Record<string, unknown>, 
   const waktu = opsi.sekarang ?? new Date();
   const amplop: AmplopOutbox = {
     event_id: (opsi.buatUlid ?? ulid)(waktu.getTime()),
-    event_type: jenis,
+    jenis,
     schema_version: VERSI_SKEMA_SAAT_INI,
     occurred_at: waktu.toISOString(),
-    payload,
+    data: payload,
   };
   validasiAmplop(amplop);
   return amplop;

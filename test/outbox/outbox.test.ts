@@ -49,7 +49,7 @@ describe("7 event berversi", () => {
       const a = buatAmplop(jenis, CONTOH[jenis], { sekarang: T0 });
       expect(a.event_id).toMatch(POLA_ULID);
       expect(a.occurred_at).toBe("2026-10-21T01:00:00.000Z");
-      expect(a.schema_version).toBe(1);
+      expect(a.schema_version).toBe("1");
       expect(() => validasiAmplop(a)).not.toThrow();
     });
   }
@@ -67,7 +67,7 @@ describe("7 event berversi", () => {
 
   test("versi tak didukung dan bidang asing ditolak", () => {
     const a = buatAmplop("pesanan.dibayar", CONTOH["pesanan.dibayar"]!);
-    expect(() => validasiAmplop({ ...a, schema_version: 2 })).toThrow(/versi_tidak_didukung/);
+    expect(() => validasiAmplop({ ...a, schema_version: "2" })).toThrow(/versi_tidak_didukung/);
     expect(() => buatAmplop("pesanan.dibayar", { ...CONTOH["pesanan.dibayar"]!, ekstra: 1 })).toThrow(/bidang_tidak_dikenal/);
   });
 

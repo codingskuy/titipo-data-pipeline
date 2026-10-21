@@ -58,4 +58,4 @@ function naikkan(s: string): string {
 }
 
 export const ulid = buatPembuatUlid();
-export const POLA_ULID = /^[0-7][0-9A-HJKMNP-TV-Z]{25}$/;
+export const POLA_ULID = /^[0-9A-HJKMNP-TV-Z]{26}$/;

@@ -8,8 +8,8 @@ Tiket TTP-DATA-002 (#2). FSD 30-kontrak §Event menetapkan 7 event pesanan yang 
 
 ## Keputusan
 
-1. Event: `pesanan.dibuat`, `pesanan.dibayar`, `pesanan.dikonfirmasi`, `pesanan.diserahkan`, `pesanan.dialihkan`, `fee.dicairkan`, `konflik.dicatat`. Skema v1 ada di `src/outbox/events.ts` (`SKEMA_V1`); bidang di luar skema ditolak.
-2. Amplop outbox: `event_id` (ULID, juga kunci idempoten), `event_type`, `schema_version` (=1), `occurred_at` (ISO-8601 UTC), `payload`. Uang integer rupiah, berat gram integer (FSD).
+1. Event: `pesanan.dibuat`, `pesanan.dibayar`, `pesanan.dikonfirmasi`, `pesanan.diserahkan`, `pesanan.dialihkan`, `fee.dicairkan`, `konflik.dicatat`. Skema `data` v1 ada di `src/outbox/events.ts` (`SKEMA_V1`); bidang di luar skema ditolak.
+2. Amplop outbox mengikuti skema `EventPesanan` di `docs/api/openapi.yaml` backend-service: `event_id` (ULID, juga kunci idempoten), `jenis`, `schema_version` (string, `"1"`), `occurred_at` (ISO-8601 UTC), `data`. Isi `data` per jenis adalah asumsi karena openapi hanya menulis `additionalProperties: true`. Uang integer rupiah, berat gram integer (FSD).
 3. Tanpa PII mentah: payload hanya id anonim; kunci bernama `nama`, `alamat`, `telepon`, `email`, `foto`, koordinat, dan sejenisnya ditolak validator. Foto tidak lewat pipeline.
 4. Outbox dikirim FIFO satu kali per event. Event berkunci agregat sama (kode pesanan, atau id vendor untuk `fee.dicairkan`) tidak saling melompati; agregat berbeda tidak saling menghalangi.
 5. Duplikat: tujuan menjawab duplikat -> baris ditandai terkirim tanpa kirim ulang. `enqueue` idempoten menurut `event_id`.

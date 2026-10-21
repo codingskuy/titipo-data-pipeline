@@ -12,9 +12,9 @@ export const JENIS_EVENT = [
 ] as const;
 export type JenisEvent = (typeof JENIS_EVENT)[number];
 
-export const VERSI_SKEMA_SAAT_INI = 1;
+export const VERSI_SKEMA_SAAT_INI = "1";
 /** Versi yang masih diterima pembaca (dual-read 30 hari saat bump versi). */
-export const VERSI_DIDUKUNG: readonly number[] = [1];
+export const VERSI_DIDUKUNG: readonly string[] = ["1"];
 
 type Bidang = "string" | "integer" | "kode_pesanan" | "id" | "ulid" | "waktu_utc";
 type Spesifikasi = Readonly<Record<string, Bidang | `${Bidang}?`>>;
@@ -48,10 +48,10 @@ const KUNCI_TERLARANG = /(^|_)(nama|alamat|telepon|telp|hp|email|foto|url_foto|l
 
 export interface AmplopOutbox {
   readonly event_id: string; // ULID; sekaligus kunci idempoten
-  readonly event_type: JenisEvent;
-  readonly schema_version: number;
+  readonly jenis: JenisEvent;
+  readonly schema_version: string;
   readonly occurred_at: string; // ISO-8601 UTC
-  readonly payload: Readonly<Record<string, unknown>>;
+  readonly data: Readonly<Record<string, unknown>>;
 }
 
 export class GalatValidasi extends Error {
@@ -72,8 +72,8 @@ function cocok(tipe: Bidang, nilai: unknown): boolean {
   }
 }
 
-export function validasiPayload(jenis: JenisEvent, versi: number, payload: unknown): void {
-  if (!VERSI_DIDUKUNG.includes(versi)) throw new GalatValidasi("versi_tidak_didukung", String(versi));
+export function validasiPayload(jenis: JenisEvent, versi: string, payload: unknown): void {
+  if (!VERSI_DIDUKUNG.includes(versi)) throw new GalatValidasi("versi_tidak_didukung", versi);
   if (typeof payload !== "object" || payload === null || Array.isArray(payload)) throw new GalatValidasi("payload_bukan_objek");
   const obj = payload as Record<string, unknown>;
   const skema = SKEMA_V1[jenis];
@@ -94,8 +94,8 @@ export function validasiPayload(jenis: JenisEvent, versi: number, payload: unkno
 }
 
 export function validasiAmplop(a: AmplopOutbox): void {
-  if (!(JENIS_EVENT as readonly string[]).includes(a.event_type)) throw new GalatValidasi("event_type_tidak_dikenal", a.event_type);
+  if (!(JENIS_EVENT as readonly string[]).includes(a.jenis)) throw new GalatValidasi("jenis_tidak_dikenal", a.jenis);
   if (!cocok("ulid", a.event_id)) throw new GalatValidasi("event_id_bukan_ulid");
   if (!cocok("waktu_utc", a.occurred_at)) throw new GalatValidasi("occurred_at_bukan_utc");
-  validasiPayload(a.event_type, a.schema_version, a.payload);
+  validasiPayload(a.jenis, a.schema_version, a.data);
 }
