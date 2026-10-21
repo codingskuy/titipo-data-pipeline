@@ -15,13 +15,27 @@ titipo-backend-service (DB titipo: pesanan, langganan)
 
 ## Event
 
-| Nama | Kapan | Kunci |
-|------|-------|-------|
-| `titipo.pesanan_dibuat` | pesanan dibuat | id pesanan, id vendor, jadwal |
-| `titipo.pesanan_selesai` | pesanan selesai | id pesanan, durasi |
-| `titipo.langganan_diubah` | langganan aktif/nonaktif | id rumah tangga, pola |
+7 event pesanan di outbox (FSD 30-kontrak; skema v1 di `src/outbox/events.ts`, keputusan di ADR-0002):
 
-Tanpa PII mentah — hanya id + agregat.
+| Nama | Kapan |
+|------|-------|
+| `pesanan.dibuat` | checkout pesanan |
+| `pesanan.dibayar` | pembayaran dikonfirmasi gateway |
+| `pesanan.dikonfirmasi` | vendor menerima/menolak |
+| `pesanan.diserahkan` | serah ke rumah tangga |
+| `pesanan.dialihkan` | pesanan dialihkan ke vendor cadangan |
+| `fee.dicairkan` | job cair-fee |
+| `konflik.dicatat` | konflik/laporan pesanan |
+
+Tanpa PII mentah, hanya id anonim.
+
+## Pengembangan
+
+```bash
+bun install
+bun run check   # tsc strict
+bun test
+```
 
 ## Struktur
 
